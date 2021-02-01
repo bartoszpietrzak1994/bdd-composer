@@ -1,0 +1,13 @@
+version: "3.8"
+x-default-service-common: &default-service-common
+  restart: unless-stopped
+
+services:
+  users_service:
+    <<: *default-service-common
+    image: users-service:latest
+    ports: ["8080:8080"]
+  notifications_service:
+    <<: *default-service-common
+    image: notification-service:latest
+    ports: ["8081:8081"]
