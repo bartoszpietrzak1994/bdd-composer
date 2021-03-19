@@ -9,11 +9,14 @@ repositories {
 }
 
 dependencies {
+    implementation files('/Users/bartoszpietrzak/git/bdd/bdd-users-service-01/client/build/libs/users-service-client-1.0-SNAPSHOT.jar')
+    implementation files('/Users/bartoszpietrzak/git/bdd/bdd-notification-service/client/build/libs/notification-service-client-1.0-SNAPSHOT.jar')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.joda:joda-money:1.0.1'
     implementation 'io.cucumber:cucumber-java:6.9.1'
     implementation 'io.cucumber:cucumber-junit:6.9.1'
     implementation 'com.github.javafaker:javafaker:1.0.2'
+    implementation 'org.assertj:assertj-core:3.18.1'
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"

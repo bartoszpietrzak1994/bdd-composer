@@ -6,8 +6,23 @@ services:
   users_service:
     <<: *default-service-common
     image: users-service:latest
-    ports: ["8080:8080"]
+    ports: ["${USERS_SERVICE_EXTERNAL_PORT}:${USERS_SERVICE_INTERNAL_PORT}"]
+    hostname: "${USERS_SERVICE_INTERNAL_URL}"
+    environment:
+      NOTIFICATION_SERVICE_URL: "${NOTIFICATION_SERVICE_URL}"
   notifications_service:
     <<: *default-service-common
     image: notification-service:latest
-    ports: ["8081:8081"]
+    ports: ["${NOTIFICATION_SERVICE_EXTERNAL_PORT}:${NOTIFICATION_SERVICE_INTERNAL_PORT}"]
+    hostname: "${NOTIFICATION_SERVICE_INTERNAL_URL}"
+    environment:
+      SMTP_HOST: "${SMTP_SERVER_HOST}"
+      SMTP_PORT: "${SMTP_SERVER_INTERNAL_PORT}"
+      SMTP_AUTH: "${SMTP_AUTH}"
+      SMTP_TLS_ENABLED: "${SMTP_TLS_ENABLED}"
+      SMTP_MAIL_DEBUG: "${SMTP_MAIL_DEBUG}"
+  fake-smtp-server:
+    <<: *default-service-common
+    image: reachfive/fake-smtp-server
+    ports: ["${SMTP_UI_EXTERNAL_PORT}:${SMTP_UI_INTERNAL_PORT}", "${SMTP_SERVER_EXTERNAL_PORT}:${SMTP_SERVER_INTERNAL_PORT}"]
+    hostname: "${SMTP_SERVER_HOST}"
