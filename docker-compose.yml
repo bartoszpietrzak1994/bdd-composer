@@ -6,10 +6,11 @@ services:
   users_service:
     <<: *default-service-common
     image: users-service:latest
-    ports: ["${USERS_SERVICE_EXTERNAL_PORT}:${USERS_SERVICE_INTERNAL_PORT}"]
-    hostname: "${USERS_SERVICE_INTERNAL_URL}"
+    ports: ["${USER_SERVICE_EXTERNAL_PORT}:${USER_SERVICE_INTERNAL_PORT}"]
+    hostname: "${USER_SERVICE_INTERNAL_URL}"
     environment:
       NOTIFICATION_SERVICE_URL: "${NOTIFICATION_SERVICE_URL}"
+
   notifications_service:
     <<: *default-service-common
     image: notification-service:latest
@@ -21,8 +22,29 @@ services:
       SMTP_AUTH: "${SMTP_AUTH}"
       SMTP_TLS_ENABLED: "${SMTP_TLS_ENABLED}"
       SMTP_MAIL_DEBUG: "${SMTP_MAIL_DEBUG}"
+
   fake-smtp-server:
     <<: *default-service-common
     image: reachfive/fake-smtp-server
     ports: ["${SMTP_UI_EXTERNAL_PORT}:${SMTP_UI_INTERNAL_PORT}", "${SMTP_SERVER_EXTERNAL_PORT}:${SMTP_SERVER_INTERNAL_PORT}"]
     hostname: "${SMTP_SERVER_HOST}"
+
+  executable-specifications:
+    <<: *default-service-common
+    image: executable-specifications:latest
+    depends_on:
+      - users_service
+      - notifications_service
+      - fake-smtp-server
+    environment:
+      USER_SERVICE_URL: "${USER_SERVICE_URL}"
+      NOTIFICATION_SERVICE_URL: "${NOTIFICATION_SERVICE_URL}"
+      EMAIL_SERVER_GET_EMAILS_URL: "${EMAIL_SERVER_GET_EMAILS_URL}"
+
+  start_services:
+    image: docker-wait-for-dependencies:latest
+    depends_on:
+      - users_service
+      - notifications_service
+      - fake-smtp-server
+    command: "${USER_SERVICE_INTERNAL_URL}:${USER_SERVICE_INTERNAL_PORT} ${NOTIFICATION_SERVICE_INTERNAL_URL}:${NOTIFICATION_SERVICE_INTERNAL_PORT} ${SMTP_SERVER_HOST}:${SMTP_SERVER_INTERNAL_PORT}"
